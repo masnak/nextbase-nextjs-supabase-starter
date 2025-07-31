@@ -92,7 +92,7 @@ export const EmailAndPassword = ({
                 'flex w-full justify-center rounded-lg border border-transparent py-3 text-white dark:text-black px-4 text-sm font-medium  shadow-xs focus:outline-hidden focus:ring-2 focus:ring-offset-2',
                 isLoading
                   ? 'bg-yellow-300 dark:bg-yellow-700 '
-                  : 'bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100  '
+                  : 'bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100  ',
               )}
             >
               Loading...
@@ -104,7 +104,7 @@ export const EmailAndPassword = ({
                 'flex w-full justify-center rounded-lg border border-transparent py-2 text-white dark:text-black px-4 text-sm font-medium  shadow-xs focus:outline-hidden focus:ring-2 focus:ring-offset-2',
                 isLoading
                   ? 'bg-yellow-300 dark:bg-yellow-700 '
-                  : 'bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100  '
+                  : 'bg-black dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100  ',
               )}
             >
               {view === 'sign-in' ? 'Login' : 'Sign up'}

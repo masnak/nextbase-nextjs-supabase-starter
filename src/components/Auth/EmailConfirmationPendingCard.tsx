@@ -50,8 +50,8 @@ export function EmailConfirmationPendingCard({
                 type === 'login'
                   ? '/login'
                   : type === 'sign-up'
-                  ? '/sign-up'
-                  : '/login'
+                    ? '/sign-up'
+                    : '/login',
               );
             }}
           >

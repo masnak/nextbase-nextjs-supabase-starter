@@ -68,7 +68,7 @@ export function Login({
         });
         toastRef.current = undefined;
       },
-    }
+    },
   );
 
   const { execute: executePassword, status: passwordStatus } = useAction(
@@ -95,7 +95,7 @@ export function Login({
         });
         toastRef.current = undefined;
       },
-    }
+    },
   );
 
   const { execute: executeProvider, status: providerStatus } = useAction(
@@ -117,7 +117,7 @@ export function Login({
         });
         toastRef.current = undefined;
       },
-    }
+    },
   );
 
   return (
@@ -198,7 +198,7 @@ export function Login({
                     providers={['google', 'github', 'twitter']}
                     isLoading={providerStatus === 'executing'}
                     onProviderLoginRequested={(
-                      provider: 'google' | 'github' | 'twitter'
+                      provider: 'google' | 'github' | 'twitter',
                     ) => executeProvider({ provider, next })}
                   />
                 </CardContent>

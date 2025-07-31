@@ -14,7 +14,7 @@ export function createSuspenseResource<T>(promise: Promise<T>): Resource<T> {
     (error) => {
       status = 'error';
       result = error;
-    }
+    },
   );
 
   const read = (): T => {

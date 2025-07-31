@@ -51,7 +51,7 @@ export function SignUp({ next }: SignUpProps) {
         toast.error(errorMessage, { id: toastRef.current });
         toastRef.current = undefined;
       },
-    }
+    },
   );
 
   const { execute: executeSignUp, status: signUpStatus } = useAction(
@@ -70,7 +70,7 @@ export function SignUp({ next }: SignUpProps) {
         toast.error(errorMessage, { id: toastRef.current });
         toastRef.current = undefined;
       },
-    }
+    },
   );
 
   const { execute: executeProvider, status: providerStatus } = useAction(
@@ -91,7 +91,7 @@ export function SignUp({ next }: SignUpProps) {
         toast.error(errorMessage, { id: toastRef.current });
         toastRef.current = undefined;
       },
-    }
+    },
   );
 
   return (
@@ -167,7 +167,7 @@ export function SignUp({ next }: SignUpProps) {
                       provider: Extract<
                         AuthProvider,
                         'google' | 'github' | 'twitter'
-                      >
+                      >,
                     ) => executeProvider({ provider, next })}
                   />
                 </CardContent>

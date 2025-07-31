@@ -1,0 +1,226 @@
+# NextBase Starter 設定ガイド
+
+## 概要
+NextBase Starterは、Next.js 15 + Supabase + TypeScript + Tailwind CSSを使用したフルスタックアプリケーションです。
+
+## 必要な環境変数設定
+
+### 1. 環境変数ファイル (.env.local)
+
+プロジェクトルートに`.env.local`ファイルを作成し、以下の変数を設定してください：
+
+```bash
+# Supabase設定
+SUPABASE_PROJECT_REF=your_project_ref_here
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+```
+
+#### 設定手順：
+1. `.env.local.example`をコピーして`.env.local`を作成
+2. Supabaseダッシュボードから値を取得
+3. 各変数に実際の値を設定
+
+#### 値の取得方法：
+- **SUPABASE_PROJECT_REF**: Supabaseプロジェクトの参照ID（例：abcdefghijklmnop）
+- **NEXT_PUBLIC_SUPABASE_URL**: プロジェクト設定 → API → Project URL
+- **NEXT_PUBLIC_SUPABASE_ANON_KEY**: プロジェクト設定 → API → anon public key
+
+## 主要設定ファイル
+
+### 2. Next.js設定 (next.config.mjs)
+```javascript
+export default {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
+      // その他の画像ホスト設定
+    ],
+  },
+};
+```
+
+### 3. TypeScript設定 (tsconfig.json)
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@public/*": ["./public/*"]
+    }
+  }
+}
+```
+
+### 4. Tailwind CSS設定 (tailwind.config.js)
+```javascript
+export default {
+  darkMode: ['class'],
+  content: [
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // カスタムカラー設定
+      }
+    }
+  }
+}
+```
+
+### 5. Supabase設定 (supabase/config.toml)
+```toml
+project_id = "your-project-id"
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+```
+
+## 開発環境セットアップ
+
+### 1. 依存関係のインストール
+```bash
+# pnpmを使用（推奨）
+pnpm install
+
+# または corepack を使用
+corepack pnpm install
+```
+
+### 2. Supabaseプロジェクトのリンク
+```bash
+pnpm supabase link --project-ref YOUR_PROJECT_REF
+```
+
+### 3. データベーススキーマのプッシュ
+```bash
+pnpm supabase db push
+```
+
+### 4. 型定義の生成
+```bash
+pnpm generate:types:local
+```
+
+### 5. 開発サーバーの起動
+```bash
+pnpm dev
+```
+
+## その他の設定ファイル
+
+### ESLint設定 (.eslintrc.cjs)
+- TypeScriptとNext.jsの推奨ルール
+- Prettierとの統合
+
+### Prettier設定 (prettier.config.cjs)
+```javascript
+module.exports = {
+  singleQuote: true,
+};
+```
+
+### PostCSS設定 (postcss.config.mjs)
+```javascript
+export default {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+```
+
+### shadcn/ui設定 (components.json)
+```json
+{
+  "style": "default",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.js",
+    "css": "src/app/globals.css",
+    "baseColor": "zinc",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui"
+  }
+}
+```
+
+## テスト設定
+
+### Vitest設定 (vitest.config.ts)
+```typescript
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    environment: 'jsdom',
+  },
+})
+```
+
+### Playwright設定 (playwright.config.ts)
+```typescript
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './e2e',
+  use: {
+    baseURL: 'http://localhost:3000',
+  },
+})
+```
+
+## デプロイ設定
+
+### Vercel設定
+- 環境変数をVercelダッシュボードで設定
+- 自動デプロイが有効
+
+### その他のホスティング
+- 環境変数を適切に設定
+- ビルドコマンド: `pnpm build`
+- 開始コマンド: `pnpm start`
+
+## トラブルシューティング
+
+### よくある問題
+1. **環境変数が設定されていない**: `.env.local`ファイルを確認
+2. **Supabase接続エラー**: URLとキーが正しいか確認
+3. **型エラー**: `pnpm generate:types:local`を実行
+4. **pnpmコマンドが見つからない**: `corepack pnpm`を使用
+
+### ログの確認
+```bash
+# 開発サーバーのログ
+pnpm dev
+
+# ビルドエラーの確認
+pnpm build
+
+# 型チェック
+pnpm tsc
+```
+
+## セキュリティ注意事項
+
+- `.env.local`ファイルはGitにコミットしない
+- 本番環境では適切な環境変数管理を使用
+- SupabaseのRLS（Row Level Security）を有効にする
+- APIキーは適切に管理する

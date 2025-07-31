@@ -2,7 +2,7 @@ import { AppSupabaseClient, AuthProvider, Table } from '@/types';
 import { toSiteURL } from './helpers';
 
 export const getAllItems = async (
-  supabase: AppSupabaseClient
+  supabase: AppSupabaseClient,
 ): Promise<Array<Table<'items'>>> => {
   const { data, error } = await supabase.from('items').select('*');
 
@@ -15,7 +15,7 @@ export const getAllItems = async (
 
 export const insertItem = async (
   supabase: AppSupabaseClient,
-  item: { name: string; description: string }
+  item: { name: string; description: string },
 ): Promise<Table<'items'>> => {
   const { data, error } = await supabase
     .from('items')
@@ -32,7 +32,7 @@ export const insertItem = async (
 
 export const updateItem = async (
   supabase: AppSupabaseClient,
-  item: { id: string; name: string; description: string }
+  item: { id: string; name: string; description: string },
 ) => {
   const { data, error } = await supabase.from('items').update(item).single();
 
@@ -55,7 +55,7 @@ export const deleteItem = async (supabase: AppSupabaseClient, id: string) => {
 
 export const getItem = async (
   supabase: AppSupabaseClient,
-  id: string
+  id: string,
 ): Promise<Table<'items'>> => {
   const { data, error } = await supabase
     .from('items')
@@ -72,7 +72,7 @@ export const getItem = async (
 
 export const signInWithMagicLink = async (
   supabase: AppSupabaseClient,
-  email: string
+  email: string,
 ) => {
   const { error } = await supabase.auth.signInWithOtp({
     email,
@@ -89,7 +89,7 @@ export const signInWithMagicLink = async (
 export const signInWithPassword = async (
   supabase: AppSupabaseClient,
   email: string,
-  password: string
+  password: string,
 ) => {
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -103,7 +103,7 @@ export const signInWithPassword = async (
 
 export const resetPassword = async (
   supabase: AppSupabaseClient,
-  email: string
+  email: string,
 ) => {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: toSiteURL('/update-password'),
@@ -116,7 +116,7 @@ export const resetPassword = async (
 
 export const updatePassword = async (
   supabase: AppSupabaseClient,
-  password: string
+  password: string,
 ) => {
   const { error } = await supabase.auth.updateUser({
     password,
@@ -129,7 +129,7 @@ export const updatePassword = async (
 
 export const signInWithProvider = async (
   supabase: AppSupabaseClient,
-  provider: AuthProvider
+  provider: AuthProvider,
 ) => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -146,7 +146,7 @@ export const signInWithProvider = async (
 export const signUp = async (
   supabase: AppSupabaseClient,
   email: string,
-  password: string
+  password: string,
 ) => {
   const { error } = await supabase.auth.signUp({
     email,
@@ -162,7 +162,7 @@ export const signUp = async (
 };
 
 export const getAllPrivateItems = async (
-  supabase: AppSupabaseClient
+  supabase: AppSupabaseClient,
 ): Promise<Array<Table<'private_items'>>> => {
   const { data, error } = await supabase.from('private_items').select('*');
 
@@ -175,7 +175,7 @@ export const getAllPrivateItems = async (
 
 export const insertPrivateItem = async (
   supabase: AppSupabaseClient,
-  item: { name: string; description: string }
+  item: { name: string; description: string },
 ): Promise<Table<'private_items'>> => {
   const { data, error } = await supabase
     .from('private_items')
@@ -192,7 +192,7 @@ export const insertPrivateItem = async (
 
 export const updatePrivateItem = async (
   supabase: AppSupabaseClient,
-  item: { id: string; name: string; description: string }
+  item: { id: string; name: string; description: string },
 ) => {
   const { data, error } = await supabase
     .from('private_items')
@@ -208,7 +208,7 @@ export const updatePrivateItem = async (
 
 export const deletePrivateItem = async (
   supabase: AppSupabaseClient,
-  id: string
+  id: string,
 ) => {
   const { error } = await supabase.from('private_items').delete().match({ id });
 
@@ -221,7 +221,7 @@ export const deletePrivateItem = async (
 
 export const getPrivateItem = async (
   supabase: AppSupabaseClient,
-  id: string
+  id: string,
 ): Promise<Table<'private_items'>> => {
   const { data, error } = await supabase
     .from('private_items')

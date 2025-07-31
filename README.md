@@ -2,60 +2,60 @@
 
 ![NextBase Lite Open Source Free Boilerplate](https://github.com/imbhargav5/nextbase-nextjs13-supabase-starter/blob/main/.github/litebanner.png?raw=true)
 
-Nextbase Lite is a simple Next.js 13 + Supabase boilerplate. It includes a Next.js 13 app with Typescript, Supabase and Tailwind CSS. It includes the all new `app` folder, `layout` components, React `server components` and more!
+NextBase Lite は、Next.js 15 + Supabase のシンプルなボイラープレートです。TypeScript、Supabase、Tailwind CSS を含む Next.js 15 アプリが含まれています。新しい`app`フォルダ、`layout`コンポーネント、React `server components`などが含まれています！
 
-## Features
+## 機能
 
 - 🚀 Next.js 15
-- 💻 Data fetching examples in React server and client components. Suspenseful data fetching with minimal loading screens.
-- ⚛️ React query setup configured
-- 🔥 React Hot Toast component
-- 💻 Fully typed with Typescript. Includes automatic type generation for Supabase tables
-- 🎨 Tailwindcss
-- 🧪 Unit testing and integration testing setups built-in
-- 💚 Eslint, typescript, prettier, postcss configured for dev and test environments
-- 📈 Automatic sitemap generation
-- 🔍 SEO metadata, JSON-LD and Open Graph tags with NEXT SEO
-- ✍️ Semantic release with Automatic changelog generation
-- 🎨 Prettier Code formatter
-- 💎 Minimal styling
-- 📖 Codebase which is easy to read and modify
+- 💻 React サーバーコンポーネントとクライアントコンポーネントでのデータ取得例。最小限のローディング画面でのサスペンスフルなデータ取得。
+- ⚛️ React Query セットアップ設定済み
+- 🔥 React Hot Toast コンポーネント
+- 💻 TypeScript で完全に型付け。Supabase テーブルの自動型生成を含む
+- 🎨 Tailwind CSS
+- 🧪 ユニットテストと統合テストのセットアップが組み込み済み
+- 💚 ESLint、TypeScript、Prettier、PostCSS が開発環境とテスト環境用に設定済み
+- 📈 自動サイトマップ生成
+- 🔍 SEO メタデータ、JSON-LD、Open Graph タグ（NEXT SEO 付き）
+- ✍️ セマンティックリリースと自動チェンジログ生成
+- 🎨 Prettier コードフォーマッター
+- 💎 ミニマルなスタイリング
+- 📖 読みやすく修正しやすいコードベース
 
-### Development
+### 開発
 
-1. Clone the repo
-2. Install dependencies with `yarn`
-3. Create a Supabase account if you don't have one already
-4. Create a new project in Supabase
-5. Link Supabase to your project using `yarn supabase link --project-ref <project-ref>`. You can get your project ref from the Supabase Project dashboard (Project Settings -> API)
-6. Duplicate `.env.local.example` and rename it to `.env.local` and add the Project ref, Supabase URL and anon key.
-7. Push the database schema to your Supabase project using `yarn supabase db push`.
-8. Generate types for your Supabase tables using `yarn generate:types:local`.
-9. Run `yarn dev` to start the development server.
+1. リポジトリをクローン
+2. `pnpm install`で依存関係をインストール
+3. まだ Supabase アカウントがない場合は作成
+4. Supabase で新しいプロジェクトを作成
+5. `pnpm supabase link --project-ref <project-ref>`で Supabase をプロジェクトにリンク。プロジェクト参照は Supabase プロジェクトダッシュボード（プロジェクト設定 → API）から取得できます
+6. `.env.local.example`を複製して`.env.local`にリネームし、プロジェクト参照、Supabase URL、匿名キーを追加
+7. `pnpm supabase db push`でデータベーススキーマを Supabase プロジェクトにプッシュ
+8. `pnpm generate:types:local`で Supabase テーブルの型を生成
+9. `pnpm dev`で開発サーバーを起動
 
-### Testing
+### テスト
 
-1. Unit test using `yarn test`
-2. End-to-end test using `yarn test:e2e`
+1. ユニットテスト: `pnpm test`
+2. エンドツーエンドテスト: `pnpm test:e2e`
 
-### Deployment
+### デプロイ
 
-This is a simple Next.js project. Deployment is the same as any other Next.js project. You can deploy it to Vercel, Netlify, or any other hosting provider.
+これはシンプルな Next.js プロジェクトです。デプロイは他の Next.js プロジェクトと同じです。Vercel、Netlify、またはその他のホスティングプロバイダーにデプロイできます。
 
-### Contributing
+### 貢献
 
-Contributions are welcome. Please open an issue or a PR.
+貢献を歓迎します。イシューまたは PR を開いてください。
 
-### License
+### ライセンス
 
 MIT
 
-### Troubleshooting
+### トラブルシューティング
 
-Checkout the [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) file for common issues.
+一般的な問題については[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)ファイルを確認してください。
 
-## Premium NextBase Boilerplate
+## プレミアム NextBase ボイラープレート
 
-Also checkout our premium boilerplate with more features. It includes a fully functional authentication system, user profiles, organisations, row level security, and more.
+より多くの機能を持つプレミアムボイラープレートもチェックしてください。完全に機能する認証システム、ユーザープロファイル、組織、行レベルセキュリティなどが含まれています。
 
 [![NextBase Boilerplate](https://github.com/imbhargav5/nextbase-nextjs13-supabase-starter/blob/main/.github/banner.png?raw=true)](https://usenextbase.com)

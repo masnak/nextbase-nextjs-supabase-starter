@@ -1,3 +1,9 @@
+/**
+ * Based on NextBase Starter
+ * Copyright (c) 2023 Bhargav Ponnapalli
+ * MIT License
+ */
+
 import Footer from '@/components/Footer';
 import '@/styles/globals.css';
 import { Inter, Roboto_Mono } from 'next/font/google';

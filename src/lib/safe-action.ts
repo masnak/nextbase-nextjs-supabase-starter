@@ -24,7 +24,7 @@ export const actionClient = createSafeActionClient().use(
       // In production, just execute the action without logging
       return await next();
     }
-  }
+  },
 );
 
 export const authActionClient = actionClient.use(async ({ next }) => {

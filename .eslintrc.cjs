@@ -14,11 +14,15 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       parserOptions: {
         project: tsConfigs,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
       },
       plugins: ['@typescript-eslint', 'prettier'],
       rules: {
         'prettier/prettier': 1,
         '@typescript-eslint/no-unused-vars': 1,
+        '@typescript-eslint/no-explicit-any': 'warn',
+        '@typescript-eslint/prefer-const': 'error',
       },
       files: ['src/**/*.ts', 'src/**/*.tsx'],
     },
@@ -31,6 +35,8 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       parserOptions: {
         project: tsConfigs,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
       },
       plugins: [
         '@typescript-eslint',
@@ -45,4 +51,8 @@ module.exports = {
   ],
   root: true,
   ignorePatterns: ['*.js', '*.mjs', '*.cjs', '*.json'],
+  env: {
+    node: true,
+    es2024: true,
+  },
 };

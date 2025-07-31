@@ -15,7 +15,7 @@ export const getAllPrivateItems = async (): Promise<
 };
 
 export const getPrivateItem = async (
-  id: string
+  id: string,
 ): Promise<Table<'private_items'>> => {
   const supabase = createSupabaseClient();
   const { data, error } = await supabase
