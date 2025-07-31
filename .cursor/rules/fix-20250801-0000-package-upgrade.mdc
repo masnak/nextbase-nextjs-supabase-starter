@@ -1,0 +1,444 @@
+---
+title: 'Package Upgrade Plan v4→v5 Migration'
+description: 'TanStack Query v4→v5, TypeScript ESLint v6→v8, TypeScript 5.8.3→5.9.2 詳細移行計画'
+date: '2025-01-31'
+author: 'Development Team'
+version: '1.0'
+priority: 'High'
+estimated_duration: '1 週間'
+tags: ['migration', 'typescript', 'react-query', 'eslint', 'breaking-changes']
+---
+
+# 📦 Package Upgrade Migration Plan
+
+## 🎯 概要
+
+### アップグレード対象パッケージ
+
+- **@tanstack/react-query**: 4.36.1 → 5.84.0 (MAJOR)
+- **@typescript-eslint**: 6.21.0 → 8.38.0 (MAJOR)
+- **TypeScript**: 5.8.3 → 5.9.2 (MINOR)
+- **@hookform/resolvers**: 3.10.0 → 5.2.1 (MAJOR)
+
+### 影響スコープ
+
+- **高影響**: 認証フロー、データフェッチング、型チェック
+- **中影響**: ESLintルール、フォームバリデーション
+- **低影響**: UIコンポーネント、スタイリング
+
+## 🚨 BREAKING CHANGES サマリー
+
+### TanStack Query v5
+
+1. **API形式統一**: すべてオブジェクト形式に変更
+2. **コールバック削除**: onSuccess, onError, onSettled削除
+3. **状態フラグ変更**: isLoading → isPending, isPreviousData → isPlaceholderData
+4. **Infinite Query**: initialPageParam必須
+
+### TypeScript ESLint v8
+
+1. **設定システム**: flat config推奨、projectService導入
+2. **ルール置換**: ban-types分割、prefer-ts-expect-error非推奨
+3. **TypeScript 5.9.2**: 新strictモード対応
+
+### TypeScript 5.9.2
+
+1. **strict mode**: 暗黙的any型エラー
+2. **型推論強化**: より厳密な型チェック
+
+## 📋 段階的実行プラン
+
+### Phase 1: 基盤整備 (1日)
+
+#### 1.1 事前準備
+
+    # Git状態確認とバックアップ
+    git status
+    git stash push -m "Before major upgrade"
+    git checkout -b upgrade/major-packages-v5
+
+#### 1.2 依存関係確認
+
+    # 現在の依存関係確認
+    pnpm list --depth=0
+    pnpm outdated
+
+#### 1.3 テスト環境準備
+
+    # テスト実行確認
+    pnpm test
+    pnpm build
+    pnpm lint
+
+### Phase 2: React Query v4→v5 移行 (2-3日)
+
+#### 2.1 パッケージアップデート
+
+    # React Query v5インストール
+    pnpm update @tanstack/react-query@5.84.0
+
+#### 2.2 自動移行ツール実行
+
+    # 公式コードモッド適用
+    npx jscodeshift --extensions=ts,tsx \
+      --parser=tsx \
+      --transform=./node_modules/@tanstack/react-query/build/codemods/src/v5/remove-overloads/remove-overloads.cjs \
+      src/
+
+#### 2.3 手動修正項目
+
+**2.3.1 API形式の統一**
+
+変更前のパターン:
+useQuery(key, fn, options)
+useInfiniteQuery(key, fn, options)  
+ useMutation(fn, options)
+
+変更後のパターン:
+useQuery({ queryKey, queryFn, ...options })
+useInfiniteQuery({ queryKey, queryFn, ...options })
+useMutation({ mutationFn, ...options })
+
+**2.3.2 コールバック削除への対応**
+
+src/data/auth/auth.ts などで修正:
+// 変更前
+useQuery({
+queryKey: ['user'],
+queryFn: fetchUser,
+onSuccess: (data) => toast.success('ログイン成功!'),
+onError: (error) => toast.error(error.message)
+})
+
+    // 変更後 - useEffectで代替
+    const query = useQuery({
+      queryKey: ['user'],
+      queryFn: fetchUser
+    })
+
+    React.useEffect(() => {
+      if (query.data && !query.isPending) {
+        toast.success('ログイン成功!')
+      }
+    }, [query.data, query.isPending])
+
+    React.useEffect(() => {
+      if (query.error) {
+        toast.error(query.error.message)
+      }
+    }, [query.error])
+
+**2.3.3 状態フラグの更新**
+
+データフェッチングコンポーネントで修正:
+// Import追加
+import { keepPreviousData } from '@tanstack/react-query'
+
+    // 変更前
+    const { data, isLoading, isPreviousData } = useQuery({
+      queryKey: ['items', page],
+      queryFn: () => fetchItems(page),
+      keepPreviousData: true
+    })
+
+    // 変更後
+    const { data, isPending, isPlaceholderData } = useQuery({
+      queryKey: ['items', page],
+      queryFn: () => fetchItems(page),
+      placeholderData: keepPreviousData
+    })
+
+**2.3.4 Infinite Query修正**
+
+Infinite scrolling実装箇所で修正:
+// 変更前
+useInfiniteQuery({
+queryKey: ['projects'],
+queryFn: ({ pageParam = 0 }) => fetchProjects(pageParam),
+getNextPageParam: (lastPage) => lastPage.nextCursor
+})
+
+    // 変更後
+    useInfiniteQuery({
+      queryKey: ['projects'],
+      queryFn: ({ pageParam }) => fetchProjects(pageParam),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage.nextCursor
+    })
+
+#### 2.4 テスト修正
+
+    # 各修正後にテスト実行
+    pnpm test src/data/
+    pnpm test src/hooks/
+
+### Phase 3: TypeScript ESLint v6→v8 移行 (1-2日)
+
+#### 3.1 パッケージアップデート
+
+    # ESLint関連パッケージ更新
+    pnpm update @typescript-eslint/eslint-plugin@8.38.0 @typescript-eslint/parser@8.38.0
+
+#### 3.2 設定ファイル移行
+
+**3.2.1 新しいflat config導入**
+
+eslint.config.js作成:
+import tseslint from 'typescript-eslint'
+
+    export default tseslint.config(
+      ...tseslint.configs.recommendedTypeChecked,
+      {
+        languageOptions: {
+          parserOptions: {
+            projectService: true,
+            tsconfigRootDir: import.meta.dirname
+          }
+        },
+        rules: {
+          // カスタムルール設定
+          '@typescript-eslint/no-unused-vars': 'error',
+          '@typescript-eslint/no-explicit-any': 'warn'
+        }
+      }
+    )
+
+**3.2.2 非推奨ルール置換**
+
+自動置換マッピング:
+'@typescript-eslint/ban-types' → 削除
+'@typescript-eslint/no-empty-object-type' → 追加
+'@typescript-eslint/no-unsafe-function-type' → 追加  
+ '@typescript-eslint/no-wrapper-object-types' → 追加
+'@typescript-eslint/no-var-requires' → '@typescript-eslint/no-require-imports'
+'@typescript-eslint/prefer-ts-expect-error' → '@typescript-eslint/ban-ts-comment'
+
+#### 3.3 新機能活用
+
+**3.3.1 Project Service設定**
+TypeScript設定の自動検出とパフォーマンス向上:
+parserOptions: {
+projectService: {
+allowDefaultProject: ['*.js', '*.mjs'],
+defaultProject: 'tsconfig.json'
+}
+}
+
+### Phase 4: TypeScript strict モード対応 (2-3日)
+
+#### 4.1 重要型エラー修正
+
+**4.1.1 Login/Signupコンポーネント**
+
+src/app/(dynamic-pages)/(login-pages)/(login-pages)/login/Login.tsx:
+// 型ガード関数追加
+function isFormData(data: any): data is { email: string; password: string } {
+return data && typeof data === 'object' && 'email' in data && 'password' in data
+}
+
+    // handleSubmit修正
+    const handleSubmit = (data: FormEvent<HTMLButtonElement> | { email: string; password: string }) => {
+      if (isFormData(data)) {
+        executeLogin({
+          email: data.email,
+          password: data.password
+        })
+      }
+    }
+
+**4.1.2 アイコンコンポーネント型定義**
+
+src/app/(dynamic-pages)/(login-pages)/(login-pages)/login/NewLogin.tsx:
+// 共通Icon型定義
+interface IconProps extends React.SVGProps<SVGSVGElement> {
+className?: string
+}
+
+    // 各アイコンコンポーネント修正
+    function ChromeIcon(props: IconProps) {
+      return (
+        <svg viewBox="0 0 24 24" {...props}>
+          {/* SVG content */}
+        </svg>
+      )
+    }
+
+    function GithubIcon(props: IconProps) { /* 同様の修正 */ }
+    function TwitterIcon(props: IconProps) { /* 同様の修正 */ }
+    function XIcon(props: IconProps) { /* 同様の修正 */ }
+
+src/app/Navbar.tsx:
+function MountainIcon(props: IconProps) {
+return (
+<svg viewBox="0 0 24 24" {...props}>
+{/_ SVG content _/}
+</svg>
+)
+}
+
+**4.1.3 AuthProvider型不一致修正**
+
+src/components/Auth/RenderProviders.tsx確認:
+// AuthProvider型定義の確認と修正
+export type AuthProvider = 'google' | 'github' | 'twitter' | 'apple'
+
+Login/Signupコンポーネントで型制約:
+// より厳密な型定義
+type SupportedProviders = Extract<AuthProvider, 'google' | 'github' | 'twitter'>
+
+    const handleProviderLogin = (provider: SupportedProviders) => {
+      // プロバイダーログイン処理
+    }
+
+#### 4.2 未使用変数削除
+
+**4.2.1 自動削除対象**
+// src/app/(dynamic-pages)/(login-pages)/(login-pages)/login/Login.tsx:27
+const nextActionType = ... // 削除
+
+    // src/app/(dynamic-pages)/(login-pages)/(login-pages)/login/NewLogin.tsx:172
+    const XIcon = ... // 削除（未使用の場合）
+
+    // 各pageコンポーネント
+    const { error } = ... // 使用していない場合は削除
+
+**4.2.2 使用状況確認** # 未使用変数検索
+pnpm lint --fix
+
+#### 4.3 Next.js最適化推奨対応
+
+**4.3.1 Image最適化**
+// 変更前
+<img src="/assets/logo.png" alt="Logo" />
+
+    // 変更後
+    import Image from 'next/image'
+    <Image src="/assets/logo.png" alt="Logo" width={200} height={50} />
+
+**4.3.2 Link最適化**  
+ // 変更前
+<a href="/">Home</a>
+
+    // 変更後
+    import Link from 'next/link'
+    <Link href="/">Home</Link>
+
+### Phase 5: 最終検証・最適化 (1日)
+
+#### 5.1 全体テスト
+
+    # 全テストスイート実行
+    pnpm test
+
+    # ビルド確認
+    pnpm build
+
+    # 型チェック
+    pnpm tsc --noEmit
+
+    # Lint確認
+    pnpm lint
+
+#### 5.2 パフォーマンス確認
+
+    # 開発サーバー起動時間測定
+    time pnpm dev
+
+    # バンドルサイズ確認
+    pnpm build
+    pnpm analyze # bundle analyzer等使用
+
+#### 5.3 新機能活用検討
+
+**5.3.1 React Query v5新機能**
+
+- Simplified optimistic updates
+- maxPages option for infinite queries
+- New combine option for useQueries
+
+**5.3.2 TypeScript ESLint v8新機能**
+
+- Project Service for better performance
+- Enhanced type-aware linting
+- Improved error messages
+
+## 🧪 テストチェックリスト
+
+### 機能テスト
+
+- [ ] ログイン/ログアウト機能
+- [ ] ユーザー登録機能
+- [ ] データフェッチング
+- [ ] フォームバリデーション
+- [ ] 認証状態管理
+
+### パフォーマンステスト
+
+- [ ] 初期ロード時間
+- [ ] データフェッチング速度
+- [ ] 型チェック時間
+- [ ] Lint実行時間
+- [ ] ビルド時間
+
+### 互換性テスト
+
+- [ ] 既存APIとの互換性
+- [ ] ブラウザ互換性
+- [ ] モバイル対応
+- [ ] TypeScript strict mode
+- [ ] ESLint設定
+
+## 🚨 リスクと対策
+
+### 高リスク項目
+
+1. **認証フロー破綻**: 段階的テストで早期発見
+2. **データフェッチング失敗**: React Query移行後即座に確認
+3. **型エラー大量発生**: TypeScript strictモードを段階的に適用
+
+### 対策
+
+- 各Phase完了後の検証必須
+- 問題発生時の即座のロールバック手順準備
+- 本番環境へのデプロイ前のステージング環境での十分な検証
+
+## 🎯 成功メトリクス
+
+### 定量的指標
+
+- ビルド時間: 現状維持または改善
+- 型エラー数: 0件達成
+- Lint警告数: 50%以上削減
+- テストカバレッジ: 現状維持
+
+### 定性的指標
+
+- 開発体験の向上
+- 型安全性の向上
+- エラー発見の早期化
+- 将来の機能追加の容易さ
+
+## 📚 参考資料
+
+### 公式ドキュメント
+
+- TanStack Query v5 Migration Guide
+- TypeScript ESLint v8 Migration Guide
+- TypeScript 5.9 Release Notes
+- React Hook Form Resolvers v5 Changes
+
+### コミュニティリソース
+
+- TypeScript ESLint Discord #v8チャンネル
+- TanStack Query GitHub Discussions
+- Next.js升级最佳实践
+
+## 📝 変更履歴
+
+| Date       | Version | Changes      | Author           |
+| ---------- | ------- | ------------ | ---------------- |
+| 2025-01-31 | 1.0     | 初期計画作成 | Development Team |
+
+---
+
+**注意**: この計画は live document として、実装中に発見された課題に応じて更新されます。各Phase完了時に進捗と課題を記録し、必要に応じて計画を調整してください。
